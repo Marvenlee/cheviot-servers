@@ -16,6 +16,7 @@ AC_CONFIG_FILES([
   nettcpip/Makefile
   sysinit/Makefile
   sysinfo/Makefile
+  syslog/Makefile
   ])
   
 AC_OUTPUT

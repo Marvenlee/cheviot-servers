@@ -4384,7 +4384,7 @@ else
 fi
 
 
-ac_config_files="$ac_config_files Makefile automount/Makefile nettcpip/Makefile sysinit/Makefile sysinfo/Makefile"
+ac_config_files="$ac_config_files Makefile automount/Makefile nettcpip/Makefile sysinit/Makefile sysinfo/Makefile syslog/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -5141,6 +5141,7 @@ do
     "nettcpip/Makefile") CONFIG_FILES="$CONFIG_FILES nettcpip/Makefile" ;;
     "sysinit/Makefile") CONFIG_FILES="$CONFIG_FILES sysinit/Makefile" ;;
     "sysinfo/Makefile") CONFIG_FILES="$CONFIG_FILES sysinfo/Makefile" ;;
+    "syslog/Makefile") CONFIG_FILES="$CONFIG_FILES syslog/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -19,5 +19,5 @@ else
 endif
 endif
 
-SUBDIRS = automount nettcpip sysinit sysinfo
+SUBDIRS = automount nettcpip sysinit sysinfo syslog
 
