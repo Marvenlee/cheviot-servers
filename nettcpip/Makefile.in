@@ -100,7 +100,7 @@ am__installdirs = "$(DESTDIR)$(serversdir)"
 PROGRAMS = $(servers_PROGRAMS)
 am_nettcpip_OBJECTS = globals.$(OBJEXT) init.$(OBJEXT) main.$(OBJEXT)
 nettcpip_OBJECTS = $(am_nettcpip_OBJECTS)
-nettcpip_DEPENDENCIES =
+nettcpip_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -251,7 +251,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 serversdir = $(prefix)/system/servers
 nettcpip_SOURCES = globals.c init.c main.c
-nettcpip_LDADD = -llwip
+
+#nettcpip_LDADD = -llwip
 AM_CPPFLAGS = -I$(srcdir) 
 AM_CCASFLAGS = -r -I$(srcdir) 
 all: all-am

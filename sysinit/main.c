@@ -1,4 +1,4 @@
-#define LOG_LEVEL_ERROR
+#define LOG_LEVEL_INFO
 
 #include <dirent.h>
 #include <fcntl.h>
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
   }
 
   if ((sc = fstat(startup_cfg_fd, &st)) != 0) {
-    log_error("fstat failed");
+    log_error("fstat of startup.cfg failed");
     close(startup_cfg_fd);
     return -1;
   }
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
   buf = malloc (st.st_size + 1);
   
   if (buf == NULL) {
-    log_error("malloc buf failed");
+    log_error("malloc buffer for startup.cfg script failed");
     close(startup_cfg_fd);
     return -1;
   }
@@ -81,45 +81,47 @@ int main(int argc, char **argv)
 
   src = buf;   
 
-  while ((line = readLine()) != NULL) {
+  while ((line = readLine()) != NULL) {    
     cmd = tokenize(line);
     
     if (cmd == NULL || cmd[0] == '\0') {
       continue;
     }
     
-    if (strncmp("#", cmd, 1) == 0) {
-      // Comment
-    } else if (strcmp("start", cmd) == 0) {
-      cmdStart(false);
-    } else if (strcmp("session", cmd) == 0) {
-      cmdStart(true);
-    } else if (strcmp("waitfor", cmd) == 0) {
-      cmdWaitfor();
-    } else if (strcmp("chdir", cmd) == 0) {
-      cmdChdir();
-    } else if (strcmp("mknod", cmd) == 0) {
-      cmdMknod();
-    } else if (strcmp("sleep", cmd) == 0) {
-      cmdSleep();
-    } else if (strcmp("pivot", cmd) == 0) {
-      cmdPivot();
-    } else if (strcmp("renamemount", cmd) == 0) {
-      cmdRenameMount();
-    } else if (strcmp("setenv", cmd) == 0) {
-      cmdSetEnv();
-    } else if (strcmp("settty", cmd) == 0) {
-      cmdSettty();
-    } else if (strcmp("printgreeting", cmd) == 0) {
-      cmdPrintGreeting();
-    } else if (strcmp("createport", cmd) == 0) {
-      cmdCreatePort();
-    } else if (strcmp("handlecommands", cmd) == 0) {
-      cmdHandleCommands();
-    } else if (strcmp("shutdown", cmd) == 0) {
-      cmdShutdown();
+    if (strncmp("#", cmd, 1) == 0 || strlen(cmd) == 0) {
+      // Comment in start script, ignore
     } else {
-      log_error("init script, unknown command: %s", cmd);
+      if (strcmp("start", cmd) == 0) {
+        cmdStart(false);
+      } else if (strcmp("session", cmd) == 0) {
+        cmdStart(true);
+      } else if (strcmp("waitfor", cmd) == 0) {
+        cmdWaitfor();
+      } else if (strcmp("chdir", cmd) == 0) {
+        cmdChdir();
+      } else if (strcmp("mknod", cmd) == 0) {
+        cmdMknod();
+      } else if (strcmp("sleep", cmd) == 0) {
+        cmdSleep();
+      } else if (strcmp("pivot", cmd) == 0) {
+        cmdPivot();
+      } else if (strcmp("renamemount", cmd) == 0) {
+        cmdRenameMount();
+      } else if (strcmp("setenv", cmd) == 0) {
+        cmdSetEnv();
+      } else if (strcmp("settty", cmd) == 0) {
+        cmdSettty();
+      } else if (strcmp("printgreeting", cmd) == 0) {
+        cmdPrintGreeting();
+      } else if (strcmp("createport", cmd) == 0) {
+        cmdCreatePort();
+      } else if (strcmp("handlecommands", cmd) == 0) {
+        cmdHandleCommands();
+      } else if (strcmp("shutdown", cmd) == 0) {
+        cmdShutdown();
+      } else {
+        log_error("init script, unknown command: %s", cmd);
+      }
     }
   }
   
@@ -438,27 +440,19 @@ int cmdSettty(void)
   int old_fd;
   char *tty;
 
-  log_info("***** cmdSettty *****");
-
   tty = tokenize(NULL);
   
   if (tty == NULL) {
-    log_info("tty token not present");
     return -1;
   }
-  
-  log_info("open tty, path:%s", tty);
   
   old_fd = open(tty, O_RDWR);  
   
   if (old_fd == -1) {
-    log_info("open tty failed");    
     return -1;
   }
   
   fd = fcntl(old_fd, F_DUPFD, 20);
-
-  log_info("fcntl old_fd=%d, res fd=%d", old_fd, fd);    
 
   close(old_fd);
 
@@ -502,7 +496,7 @@ int cmdSetEnv(void)
 void cmdPrintGreeting(void)
 {
 #if 1
-  printf("\033[0;0H\033[0J\r\n");
+//  printf("\033[0;0H\033[0J\r\n");
   printf("  \033[34;1m   .oooooo.   oooo                               o8o                .   \033[37;1m      .oooooo.    .ooooooo.  \n");
   printf("  \033[34;1m  d8P'  `Y8b  `888                               `^'              .o8   \033[37;1m     d8P'  `Y8b  d8P'   `Y8b \n");
   printf("  \033[34;1m 888           888 .oo.    .ooooo.  oooo    ooo oooo   .ooooo.  .o888oo \033[37;1m    888      888 Y88bo.      \n");
@@ -528,21 +522,19 @@ int cmdCreatePort(void)
   mnt_stat.st_mode = 0777 | _IFCHR;
   mnt_stat.st_uid = 0;
   mnt_stat.st_gid = 0;
-  mnt_stat.st_blksize = 512;
+  mnt_stat.st_blksize = 0;
   mnt_stat.st_size = 0;
-  mnt_stat.st_blocks = mnt_stat.st_size / mnt_stat.st_blksize;
+  mnt_stat.st_blocks = 0;
 
   portid = createmsgport(SYSINIT_PATH, 0, &mnt_stat);
   
   if (portid < 0) {
-    log_error("failed to mount shutdown as root");
     exit(-1);
   }
 
   kq = kqueue();
   
   if (kq < 0) {
-    log_error("failed to create kqueue");
     exit(-1);  
   }  
 
