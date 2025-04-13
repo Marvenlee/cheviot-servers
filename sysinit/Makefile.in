@@ -98,7 +98,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(serversdir)"
 PROGRAMS = $(servers_PROGRAMS)
-am_sysinit_OBJECTS = globals.$(OBJEXT) main.$(OBJEXT)
+am_sysinit_OBJECTS = globals.$(OBJEXT) init.$(OBJEXT) main.$(OBJEXT) \
+	message_loop.$(OBJEXT) run_rc.$(OBJEXT) run_s.$(OBJEXT) \
+	sessions.$(OBJEXT) shutdown.$(OBJEXT)
 sysinit_OBJECTS = $(am_sysinit_OBJECTS)
 sysinit_DEPENDENCIES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -116,7 +118,10 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/globals.Po ./$(DEPDIR)/main.Po
+am__depfiles_remade = ./$(DEPDIR)/globals.Po ./$(DEPDIR)/init.Po \
+	./$(DEPDIR)/main.Po ./$(DEPDIR)/message_loop.Po \
+	./$(DEPDIR)/run_rc.Po ./$(DEPDIR)/run_s.Po \
+	./$(DEPDIR)/sessions.Po ./$(DEPDIR)/shutdown.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -251,7 +256,13 @@ top_srcdir = @top_srcdir@
 serversdir = $(prefix)/system/servers
 sysinit_SOURCES = \
   globals.c \
-  main.c
+  init.c \
+  main.c \
+  message_loop.c \
+  run_rc.c \
+  run_s.c \
+  sessions.c \
+  shutdown.c
 
 sysinit_LDADD = -lsysinit
 AM_CFLAGS = -O0 -std=c99 -g2 -march=armv8-a -Wall
@@ -342,7 +353,13 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globals.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/init.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/message_loop.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/run_rc.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/run_s.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sessions.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shutdown.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -493,7 +510,13 @@ clean-am: clean-generic clean-serversPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/globals.Po
+	-rm -f ./$(DEPDIR)/init.Po
 	-rm -f ./$(DEPDIR)/main.Po
+	-rm -f ./$(DEPDIR)/message_loop.Po
+	-rm -f ./$(DEPDIR)/run_rc.Po
+	-rm -f ./$(DEPDIR)/run_s.Po
+	-rm -f ./$(DEPDIR)/sessions.Po
+	-rm -f ./$(DEPDIR)/shutdown.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -540,7 +563,13 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/globals.Po
+	-rm -f ./$(DEPDIR)/init.Po
 	-rm -f ./$(DEPDIR)/main.Po
+	-rm -f ./$(DEPDIR)/message_loop.Po
+	-rm -f ./$(DEPDIR)/run_rc.Po
+	-rm -f ./$(DEPDIR)/run_s.Po
+	-rm -f ./$(DEPDIR)/sessions.Po
+	-rm -f ./$(DEPDIR)/shutdown.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

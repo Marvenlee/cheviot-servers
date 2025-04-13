@@ -32,7 +32,7 @@
 
 
 // Globals
-char *argv[ARG_SZ];
+char *start_argv[ARG_SZ];
 char linebuf[256];
 char *src = NULL;
 bool tty_set = false;
@@ -42,5 +42,15 @@ int portid;
 int kq;
 bool shutdown = false;
 int shutdown_how;
+
+char *s_startup_script;
+size_t s_startup_script_size;
+
+char *s_shutdown_script;
+size_t s_shutdown_script_size;
+
+session_list_t session_list;
+
+int shutdown_how = SHUTDOWN_HALT;
 
 

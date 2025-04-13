@@ -75,8 +75,8 @@ void main(int argc, char *argv[])
     if (nevents == 1 && ev.ident == portid && ev.filter == EVFILT_MSGPORT) {
       while ((sc = getmsg(portid, &msgid, &req, sizeof req)) == sizeof req) {
         switch (req.cmd) {
-          case CMD_SENDMSG:
-            cmd_sendmsg(portid, msgid, &req);
+          case CMD_SENDIO:
+            cmd_sendio(portid, msgid, &req);
             break;
 
           default:
@@ -99,7 +99,7 @@ void main(int argc, char *argv[])
 /*
  *
  */
-void cmd_sendmsg(int portid, msgid_t msgid, iorequest_t *req)
+void cmd_sendio(int portid, msgid_t msgid, iorequest_t *req)
 {
   int sc;
   size_t req_sz;

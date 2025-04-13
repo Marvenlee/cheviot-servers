@@ -14,50 +14,43 @@
  * limitations under the License.
  */
 
-#define LOG_LEVEL_WARN
+#define LOG_LEVEL_INFO
 
-#include <errno.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include <dirent.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mount.h>
+#include <sys/debug.h>
+#include <sys/dirent.h>
+#include <sys/signal.h>
 #include <sys/stat.h>
 #include <sys/syscalls.h>
+#include <stdlib.h>
 #include <unistd.h>
-#include <sys/iorequest.h>
-#include <sys/debug.h>
-#include <sys/event.h>
-#include "automount.h"
+#include <libgen.h>
+#include <sys/syslimits.h>
+#include <sys/wait.h>
+#include <sys/mount.h>
+#include <sys/termios.h>
+#include <sys/ioctl.h>
+#include "sysinit.h"
+#include "sys/sysinit.h"
 #include "globals.h"
 
 
-/* @brief   The "/serv/automount" server
+/*
  *
- * Work-In-Progress (skeleton code)
  */
-void main(int argc, char *argv[])
+init_state_t state_message_loop(void)
 {
   int sc;
   msgid_t msgid;
   iorequest_t req;
   int nevents;
   struct kevent ev;
- 
-  log_info("automount server started");
- 
- 	init(argc, argv);
+  struct sysinit_req sysinit_req;
   
-  struct sigaction sact;
-  sact.sa_handler = &sigterm_handler;
-  sigemptyset(&sact.sa_mask);
-  sact.sa_flags = 0;
-  
-  if (sigaction(SIGTERM, &sact, NULL) != 0) {
-    exit(-1);
-  }
-
   EV_SET(&ev, portid, EVFILT_MSGPORT, EV_ADD | EV_ENABLE, 0, 0, 0); 
   kevent(kq, &ev, 1,  NULL, 0, NULL);
 
@@ -65,11 +58,24 @@ void main(int argc, char *argv[])
     errno = 0;
     nevents = kevent(kq, NULL, 0, &ev, 1, NULL);
 
+    // TODO: Maybe check sigchld, handle with waitpid/reap_processes
+
     if (nevents == 1 && ev.ident == portid && ev.filter == EVFILT_MSGPORT) {
       while ((sc = getmsg(portid, &msgid, &req, sizeof req)) == sizeof req) {
         switch (req.cmd) {
           case CMD_SENDIO:
-            cmd_sendio(portid, msgid, &req);
+            if (req.args.sendio.subclass == MSG_SUBCLASS_SYSINIT) {
+            
+              // TODO: Determine command
+            
+              readmsg(portid, msgid, &sysinit_req, sizeof sysinit_req, 0);              
+              shutdown_how = sysinit_req.u.shutdown.how;
+              shutdown = true;
+              replymsg(portid, msgid, 0, NULL, 0);
+            } else {
+              replymsg(portid, msgid, -ENOTSUP, NULL, 0);
+            }
+                                              
             break;
 
           default:
@@ -78,39 +84,28 @@ void main(int argc, char *argv[])
             break;
         }
       }      
-      
-      if (sc != 0) {
-        exit(EXIT_FAILURE);
-      }
     }
   }
-  
-  exit(0);
+
+  return STATE_STOP_SESSIONS;
 }
 
 
-/*
- *
+
+/* @brief   reap any dead zombie processes
+ * 
+ * TODO: Register notification with kqueue above
  */
-void cmd_sendio(int portid, msgid_t msgid, iorequest_t *req)
+void reap_processes(void)
 {
-  int sc;
-  size_t req_sz;
-  size_t resp_sz;
-  size_t max_resp_sz;
-  int subclass;
-  char *cmd;
+  log_info("reap_processes");
   
-  replymsg(portid, msgid, -ENOSYS, NULL, 0);
+  while(waitpid(-1, NULL, 0) != 0) {
+    sleep(5);
+  }
+
+  // call collect_process() to handle any cleanup and restart sessions.
+  
+  log_info("reap_processes exiting, waitpid returned 0");
 }
-
-
-/*
- *
- */
-void sigterm_handler(int signo)
-{
-  shutdown = true;
-}
-
 

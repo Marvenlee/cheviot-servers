@@ -32,11 +32,14 @@
 #include <sys/iorequest.h>
 #include <limits.h>
 #include <sys/sysinit.h>
+#include "sysinit.h"
 
 
 
+// Globals
+extern char **environ;
 
-extern char *argv[ARG_SZ];
+extern char *start_argv[ARG_SZ];
 extern char linebuf[256];
 extern char *src;
 extern bool tty_set;
@@ -46,6 +49,17 @@ extern int portid;
 extern int kq;
 extern bool shutdown;
 extern int shutdown_how;
+
+extern char *s_startup_script;
+extern size_t s_startup_script_size;
+
+extern char *s_shutdown_script;
+extern size_t s_shutdown_script_size;
+
+extern session_list_t session_list;
+
+extern int shutdown_how;
+
 
 #endif
 

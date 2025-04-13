@@ -3,7 +3,13 @@ servers_PROGRAMS = sysinit
 
 sysinit_SOURCES = \
   globals.c \
-  main.c
+  init.c \
+  main.c \
+  message_loop.c \
+  run_rc.c \
+  run_s.c \
+  sessions.c \
+  shutdown.c
 
 sysinit_LDADD = -lsysinit
 

@@ -51,7 +51,7 @@ void init(int argc, char *argv[]);
 int process_args(int argc, char *argv[]);
 int mount_device(void);
 
-void cmd_sendmsg(int portid, msgid_t msgid, iorequest_t *req);
+void cmd_sendio(int portid, msgid_t msgid, iorequest_t *req);
 void sigterm_handler(int signo);
 
 #endif
